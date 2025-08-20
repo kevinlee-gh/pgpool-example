@@ -13,7 +13,6 @@ class PostgresClient:
         with self.db_conn.cursor() as cursor:
             cursor.execute(query)
             return cursor.fetchall()
-    
 
 # This class will be executed when you run locust
 class PostgresLocust(User):
