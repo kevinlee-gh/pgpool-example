@@ -1,7 +1,15 @@
 services:
+  client:
+    build: ./client
+    entrypoint:
+      - tail
+      - -f
+      - /dev/null
+    
+
   node-01:
     # image: postgres:17.4-bookworm
-    build: .
+    build: ./database
     user: postgres
     restart: always
     ports:
@@ -12,7 +20,7 @@ services:
       - -chba_file=/configs/pg_hba.conf
     volumes:
       - node-01:/var/lib/postgresql/data/pgdata
-      - ./configs:/configs:ro
+      - ./database/configs:/configs:ro
     environment:
       PGDATA: /var/lib/postgresql/data/pgdata
       
