@@ -1,0 +1,29 @@
+services:
+  node-01:
+    # image: postgres:17.4-bookworm
+    build: .
+    user: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    command:
+      - postgres
+      - -cconfig_file=/configs/postgres.conf
+      - -chba_file=/configs/pg_hba.conf
+    volumes:
+      - node-01:/var/lib/postgresql/data/pgdata
+      - ./configs:/configs:ro
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: 'pg_isready -U user --dbname=postgres'
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  node-01:
