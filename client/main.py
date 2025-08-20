@@ -28,5 +28,5 @@ class PostgresLocust(User):
     @task
     def run_query(self):
         self.client.execute_query(
-            f"SELECT * FROM loadtesting.user",
+            f"SELECT * FROM stress_test.counter;",
         )
