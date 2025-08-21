@@ -1,6 +1,7 @@
-import os
+import os, sys
 import time
 import logging
+import random
 
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import Session
@@ -16,6 +17,8 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+N_INSTANCES= 20
+
 def custom_locust_task(name):
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -30,7 +33,7 @@ def custom_locust_task(name):
                 request_type="postgres",
                 name=name,
                 response_time=int((time.time() - start_time) * 1000),
-                response_length=len(res) if res else 0,
+                response_length=sys.getsizeof(res) if res else 0,
                 exception=err
             )
         return wrapper
@@ -57,4 +60,9 @@ class PostgresLocust(User):
     @custom_locust_task(name="SELECT ALL")
     def select_all(self):
         return self.db_session.query(Counter).all()
-    
+
+    @task
+    @custom_locust_task(name="SELECT BY ID")
+    def select_by_id(self):
+        idx = random.randint(0, N_INSTANCES - 1)
+        return self.db_session.query(Counter).filter(Counter.id == idx).first()

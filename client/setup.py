@@ -2,8 +2,10 @@ import logging
 
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.schema import CreateSchema
+from sqlalchemy.orm import Session
 
 from database.schema import LS_SCHEMA
+from database.schema.stress_test.counter import Counter
 
 logging.basicConfig(
     level = logging.INFO,
@@ -27,3 +29,14 @@ for schema in LS_SCHEMA:
             logger.info(f"Schema '{schema.__table_args__['schema']}' already exists.")
 
     schema.metadata.create_all(engine)
+
+db_session = Session(engine)
+for i in range(20):
+    if db_session.query(Counter).filter(Counter.id == i).all():
+        continue
+    counter = Counter(
+        id = i,
+        value= 0, count=0
+    )
+    db_session.add(counter)
+db_session.commit()
