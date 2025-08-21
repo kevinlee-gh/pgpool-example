@@ -37,18 +37,6 @@ def custom_locust_task(name):
     return decorator
 
 
-class PostgresClient:
-    def __init__(self):
-        engine = create_engine(
-            f"postgresql+psycopg2://postgres:postgres123@localhost:5432/postgres",
-            pool_timeout=60
-        )
-        self.db_session = Session(engine)
-    
-    @custom_locust_task(name="SELECT ALL")
-    def get_all(self):
-        return self.db_session.query(Counter).all()
-
 
 # This class will be executed when you run locust
 class PostgresLocust(User):
@@ -56,10 +44,17 @@ class PostgresLocust(User):
     max_wait = 1
     wait_time = between(min_wait, max_wait)
 
+    engine = create_engine(
+        f"postgresql+psycopg2://postgres:postgres123@localhost:5432/postgres",
+        pool_timeout=60
+    )
+
     def __init__(self, *args):
         super().__init__(*args)
-        self.client = PostgresClient()
+        self.db_session = Session(self.engine)
 
     @task
-    def run_query(self):
-        res = self.client.get_all()
+    @custom_locust_task(name="SELECT ALL")
+    def select_all(self):
+        return self.db_session.query(Counter).all()
+    
