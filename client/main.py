@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 def custom_locust_task(name):
     def decorator(func):
         def wrapper(*args, **kwargs):
-            err = None
+            res, err = None, None
             start_time = time.time()
             try:
                 res = func(*args, **kwargs)
