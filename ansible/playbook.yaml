@@ -4,7 +4,9 @@
   tasks:
     - debug:
         msg: "Hello, World!"
-    - wait_for:
-        host: "{{ item }}"
-        port: 5432
+    - community.postgresql.postgresql_ping:
+        login_host: "{{ item }}"
+        login_db: postgres
+        login_user: postgres
+        login_password: postgres123
       loop: "{{ nodes }}"
