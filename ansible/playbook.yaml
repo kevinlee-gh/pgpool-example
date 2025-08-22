@@ -1,12 +1,22 @@
 
-- name: "hello world"
+- name: "Check connectivity to Postgres nodes"
   hosts: bastion
   tasks:
-    - debug:
-        msg: "Hello, World!"
     - community.postgresql.postgresql_ping:
         login_host: "{{ item }}"
         login_db: postgres
         login_user: postgres
         login_password: postgres123
       loop: "{{ nodes }}"
+- name: Setup master node
+  hosts: bastion
+  tasks:
+    - name: Create replicator user
+      community.postgresql.postgresql_user:
+        login_host: "{{ master_node }}"
+        login_db: postgres
+        login_user: postgres
+        login_password: postgres123
+
+        name: replicator
+        password: "replicator123"
