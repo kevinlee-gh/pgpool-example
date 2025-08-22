@@ -1,0 +1,10 @@
+
+- name: "hello world"
+  hosts: bastion
+  tasks:
+    - debug:
+        msg: "Hello, World!"
+    - wait_for:
+        host: "{{ item }}"
+        port: 5432
+      loop: "{{ nodes }}"

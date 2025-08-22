@@ -1,6 +1,16 @@
 name: pgpool
 
 services:
+  ansible:
+    build: ./ansible
+    volumes:
+      - ./ansible:/workspace
+    working_dir: /workspace
+    entrypoint:
+      - tail
+      - -f
+      - /dev/null
+
   client:
     build: ./client
     entrypoint:
@@ -8,7 +18,6 @@ services:
       - -f
       - /dev/null
     
-
   node:
     build: ./database
     user: postgres
