@@ -3,6 +3,7 @@ bastion:
     nodes:
       - pgpool-node-1.pgpool_default
       - pgpool-node-2.pgpool_default
+      - pgpool-node-3.pgpool_default
   hosts:
     localhost:
       ansible_connection: local

@@ -45,5 +45,17 @@ services:
           # cpus: '0.01'
           memory: 2G
       mode: replicated
-      replicas: 2
+      replicas: 3
       endpoint_mode: dnsrr
+  
+  nginx:
+    build: ./nginx
+    ports:
+      - "6433:5433"   # Postgres node 1
+      - "6434:5434"   # Postgres node 2
+      - "6435:5435"   # Postgres node 3
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - node
+    
