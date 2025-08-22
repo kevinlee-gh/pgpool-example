@@ -3,7 +3,7 @@ import time
 import logging
 import random
 
-from sqlalchemy import create_engine, inspect
+from sqlalchemy import create_engine, inspect, update
 from sqlalchemy.orm import Session
 import psycopg
 from locust import User, TaskSet, task, between, events
@@ -47,22 +47,39 @@ class PostgresLocust(User):
     max_wait = 1
     wait_time = between(min_wait, max_wait)
 
-    engine = create_engine(
-        f"postgresql+psycopg2://postgres:postgres123@localhost:5432/postgres",
-        pool_timeout=60
-    )
-
     def __init__(self, *args):
         super().__init__(*args)
-        self.db_session = Session(self.engine)
+
+        engine = create_engine(
+            f"postgresql+psycopg2://postgres:postgres123@localhost:5432/postgres",
+            pool_size=1,
+            pool_timeout=60
+        )
+        self.db_session = Session(engine)
+        logger.info("PostgresLocust initialized.")
+
+    # @task
+    # @custom_locust_task(name="SELECT ALL")
+    # def select_all(self):
+    #     return self.db_session.query(Counter).all()
+
+    # @task
+    # @custom_locust_task(name="SELECT BY ID")
+    # def select_by_id(self):
+    #     idx = random.randint(0, N_INSTANCES - 1)
+    #     return self.db_session.query(Counter).filter(Counter.id == idx).first()
+    
 
     @task
-    @custom_locust_task(name="SELECT ALL")
-    def select_all(self):
-        return self.db_session.query(Counter).all()
-
-    @task
-    @custom_locust_task(name="SELECT BY ID")
-    def select_by_id(self):
+    @custom_locust_task(name="ADD 1")
+    def add_one(self):
         idx = random.randint(0, N_INSTANCES - 1)
-        return self.db_session.query(Counter).filter(Counter.id == idx).first()
+        stmt = (
+            update(Counter)
+            .where(Counter.id == idx)
+            .values(value=Counter.value + 1)
+        )
+        self.db_session.execute(stmt)
+        self.db_session.commit()
+
+        return 'OK'

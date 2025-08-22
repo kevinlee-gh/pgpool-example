@@ -34,7 +34,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.01'
+          # cpus: '0.01'
           memory: 2G
 
 volumes:
