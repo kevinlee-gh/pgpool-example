@@ -10,13 +10,14 @@
       loop: "{{ nodes }}"
 - name: Setup master node
   hosts: bastion
+  environment:
+    PGDATABASE: postgres
+    PGUSER: postgres
+    PGPASSWORD: postgres123
   tasks:
     - name: Create replicator user
       community.postgresql.postgresql_user:
         login_host: "{{ master_node }}"
-        login_db: postgres
-        login_user: postgres
-        login_password: postgres123
 
         name: replicator
         password: "replicator123"
