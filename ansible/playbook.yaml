@@ -1,23 +1,25 @@
 
 - name: "Check connectivity to Postgres nodes"
   hosts: bastion
+  vars_files:
+    - vars.yaml
+  environment: &posgres_envs
+    PGDATABASE: postgres
+    PGUSER: postgres
+    PGPASSWORD: "{{ POSTGRES_PASSWORD }}"
   tasks:
     - community.postgresql.postgresql_ping:
         login_host: "{{ item }}"
-        login_db: postgres
-        login_user: postgres
-        login_password: postgres123
       loop: "{{ nodes }}"
 - name: Setup master node
   hosts: bastion
-  environment:
-    PGDATABASE: postgres
-    PGUSER: postgres
-    PGPASSWORD: postgres123
+  vars_files:
+    - vars.yaml
+  environment: *posgres_envs
   tasks:
     - name: Create replicator user
       community.postgresql.postgresql_user:
         login_host: "{{ master_node }}"
 
         name: replicator
-        password: "replicator123"
+        password: "{{ REPLICATOR_PASSWORD }}"
