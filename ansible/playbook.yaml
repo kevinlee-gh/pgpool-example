@@ -23,3 +23,4 @@
 
         name: replicator
         password: "{{ REPLICATOR_PASSWORD }}"
+        role_attr_flags: REPLICATION
