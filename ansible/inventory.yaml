@@ -1,13 +1,13 @@
 bastion:
   vars:
     nodes:
-      - pgpool-node-1.pgpool_default
-      - pgpool-node-2.pgpool_default
-      - pgpool-node-3.pgpool_default
-    master_node: pgpool-node-1.pgpool_default
+      - node-1
+      - node-2
+      - node-3
+    master_node: node-1
     rep_nodes:
-      - pgpool-node-2.pgpool_default
-      - pgpool-node-3.pgpool_default
+      - node-2
+      - node-3
   hosts:
     localhost:
       ansible_connection: local
