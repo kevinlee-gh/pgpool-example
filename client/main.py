@@ -51,25 +51,24 @@ class PostgresLocust(User):
         super().__init__(*args)
 
         engine = create_engine(
-            f"postgresql+psycopg2://postgres:postgres123@localhost:5432/postgres",
+            f"postgresql+psycopg2://postgres:postgres123@localhost:6433/postgres",
             pool_size=1,
             pool_timeout=60
         )
         self.db_session = Session(engine)
         logger.info("PostgresLocust initialized.")
 
-    # @task
-    # @custom_locust_task(name="SELECT ALL")
-    # def select_all(self):
-    #     return self.db_session.query(Counter).all()
+    @task
+    @custom_locust_task(name="SELECT ALL")
+    def select_all(self):
+        return self.db_session.query(Counter).all()
 
-    # @task
-    # @custom_locust_task(name="SELECT BY ID")
-    # def select_by_id(self):
-    #     idx = random.randint(0, N_INSTANCES - 1)
-    #     return self.db_session.query(Counter).filter(Counter.id == idx).first()
+    @task
+    @custom_locust_task(name="SELECT BY ID")
+    def select_by_id(self):
+        idx = random.randint(0, N_INSTANCES - 1)
+        return self.db_session.query(Counter).filter(Counter.id == idx).first()
     
-
     @task
     @custom_locust_task(name="ADD 1")
     def add_one(self):
