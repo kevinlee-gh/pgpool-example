@@ -18,7 +18,6 @@ x-node-template: &node-template
   deploy:
     resources:
       limits:
-        cpus: '0.01'
         memory: 2G
 
 x-master-template: &master-template
@@ -33,7 +32,6 @@ x-master-template: &master-template
   deploy:
     resources:
       limits:
-        cpus: '1'
         memory: 2G
 
 x-slave-template: &slave-template
@@ -44,6 +42,11 @@ x-slave-template: &slave-template
     MASTER_HOST: node-1
     MASTER_REPLICATOR_USER: replicator
     MASTER_REPLICATOR_PASSWORD: replicator123
+  deploy:
+    resources:
+      limits:
+        cpus: '0.01'
+        memory: 2G
 
 services:
   ansible:
