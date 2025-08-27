@@ -28,9 +28,10 @@ elif [ -n "${MASTER_HOST}" ]; then
         fi
     done
 
-    PGPASSWORD=${MASTER_REPLICATOR_PASSWORD} pg_basebackup -h ${MASTER_HOST} -D ${PGDATA} -U ${MASTER_REPLICATOR_USER} -vRC -X stream -S ${NODE_NAME}
-else
-    echo "INFO - Bootstrapping PostgreSQL server!"
+
+    if ! (PGPASSWORD=${MASTER_REPLICATOR_PASSWORD} pg_basebackup -h ${MASTER_HOST} -D ${PGDATA} -U ${MASTER_REPLICATOR_USER} -vRC -X stream -S ${NODE_NAME}); then
+        PGPASSWORD=${MASTER_REPLICATOR_PASSWORD} psql -U ${MASTER_REPLICATOR_USER} -h ${MASTER_HOST} -c  "SELECT pg_drop_replication_slot('${NODE_NAME}');" postgres
+    fi
 fi
 
 docker-entrypoint.sh $@
