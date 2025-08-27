@@ -1,5 +1,32 @@
 name: pgpool
 
+x-node-template: &node-template
+  build: ./database
+  user: postgres
+  command:
+    - postgres
+    - -cconfig_file=/configs/postgres.conf
+    - -chba_file=/configs/pg_hba.conf
+  volumes:
+    - /var/lib/postgresql/data/pgdata
+    - ./database/configs:/configs:ro
+  environment:
+    PGDATA: /var/lib/postgresql/data/pgdata
+    
+    POSTGRES_DB: postgres
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres123
+  healthcheck:
+    test: 'pg_isready -U postgres --dbname=postgres'
+    interval: 10s
+    timeout: 5s
+    retries: 5
+  deploy:
+    resources:
+      limits:
+        # cpus: '0.01'
+        memory: 2G
+
 services:
   ansible:
     build: ./ansible
@@ -18,36 +45,24 @@ services:
       - -f
       - /dev/null
     
-  node:
-    build: ./database
-    user: postgres
-    command:
-      - postgres
-      - -cconfig_file=/configs/postgres.conf
-      - -chba_file=/configs/pg_hba.conf
+  node-1:
+    <<: *node-template
     volumes:
-      - /var/lib/postgresql/data/pgdata
+      - node-1:/var/lib/postgresql/data
       - ./database/configs:/configs:ro
-    environment:
-      PGDATA: /var/lib/postgresql/data/pgdata
-      
-      POSTGRES_DB: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
-    healthcheck:
-      test: 'pg_isready -U postgres --dbname=postgres'
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    deploy:
-      resources:
-        limits:
-          # cpus: '0.01'
-          memory: 2G
-      mode: replicated
-      replicas: 3
-      endpoint_mode: dnsrr
   
+  node-2:
+    <<: *node-template
+    volumes:
+      - node-2:/var/lib/postgresql/data
+      - ./database/configs:/configs:ro
+
+  node-3:
+    <<: *node-template
+    volumes:
+      - node-3:/var/lib/postgresql/data
+      - ./database/configs:/configs:ro
+
   nginx:
     build: ./nginx
     ports:
@@ -57,5 +72,11 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - node
-    
+      - node-1
+      - node-2
+      - node-3
+
+volumes:
+  node-1:
+  node-2:
+  node-3:
