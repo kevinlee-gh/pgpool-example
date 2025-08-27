@@ -51,7 +51,7 @@ class PostgresLocust(User):
         super().__init__(*args)
 
         engine = create_engine(
-            f"postgresql+psycopg2://postgres:postgres123@localhost:6433/postgres",
+            f"postgresql+psycopg2://postgres:postgres123@localhost:6433/benchmark_db",
             pool_size=1,
             pool_timeout=60
         )
