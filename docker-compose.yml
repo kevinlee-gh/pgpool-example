@@ -10,12 +10,6 @@ x-node-template: &node-template
   volumes:
     - /var/lib/postgresql/data/pgdata
     - ./database/configs:/configs:ro
-  environment:
-    PGDATA: /var/lib/postgresql/data/pgdata
-    
-    POSTGRES_DB: postgres
-    POSTGRES_USER: postgres
-    POSTGRES_PASSWORD: postgres123
   healthcheck:
     test: 'pg_isready -U postgres --dbname=postgres'
     interval: 10s
@@ -26,6 +20,24 @@ x-node-template: &node-template
       limits:
         # cpus: '0.01'
         memory: 2G
+
+x-master-template: &master-template
+  <<: *node-template
+  environment:
+    PGDATA: /var/lib/postgresql/data/pgdata
+    
+    POSTGRES_DB: postgres
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres123
+
+x-slave-template: &slave-template
+  <<: *node-template
+  environment:
+    PGDATA: /var/lib/postgresql/data/pgdata
+
+    MASTER_HOST: node-1
+    MASTER_REPLICATOR_USER: replicator
+    MASTER_REPLICATOR_PASSWORD: replicator123
 
 services:
   ansible:
@@ -46,19 +58,19 @@ services:
       - /dev/null
     
   node-1:
-    <<: *node-template
+    <<: *master-template
     volumes:
       - node-1:/var/lib/postgresql/data
       - ./database/configs:/configs:ro
   
   node-2:
-    <<: *node-template
+    <<: *slave-template
     volumes:
       - node-2:/var/lib/postgresql/data
       - ./database/configs:/configs:ro
 
   node-3:
-    <<: *node-template
+    <<: *slave-template
     volumes:
       - node-3:/var/lib/postgresql/data
       - ./database/configs:/configs:ro

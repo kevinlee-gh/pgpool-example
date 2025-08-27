@@ -6,5 +6,7 @@ RUN mkdir -p /var/lib/postgresql/data && chown -R postgres:postgres /var/lib/pos
 
 USER postgres
 
-ENTRYPOINT [ "docker-entrypoint.sh" ]
+COPY ./entrypoint.sh /ha-entrypoint.sh
+
+ENTRYPOINT [ "/ha-entrypoint.sh" ]
 CMD [ "postgres" ]
