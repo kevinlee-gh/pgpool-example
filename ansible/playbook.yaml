@@ -29,3 +29,10 @@
         login_host: "{{ master_node }}"
         name: benchmark_db
         comment: "Benchmark database for performance testing"
+
+    - name: Reload Configs
+      community.postgresql.postgresql_query:
+        login_host: "{{ item }}"
+        query:
+          - SELECT pg_reload_conf()
+      loop: "{{ nodes }}"
