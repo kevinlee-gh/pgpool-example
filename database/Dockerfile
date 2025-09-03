@@ -9,4 +9,4 @@ USER postgres
 COPY ./entrypoint.sh /ha-entrypoint.sh
 
 ENTRYPOINT [ "/ha-entrypoint.sh" ]
-CMD [ "postgres" ]
+CMD [ ]
