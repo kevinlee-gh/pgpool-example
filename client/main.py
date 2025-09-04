@@ -1,3 +1,5 @@
+import random
+
 from locust import User, between, task
 
 from components.client import PostgresClient
@@ -38,3 +40,26 @@ class PostgresLocust(User):
     @custom_locust_task(name="[SLAVE] SELECT ALL")
     def slave_select_all(self):
         self.slave.select_all()
+
+    @task
+    @custom_locust_task(name="Check sync")
+    def check_sync(self):
+        count = self.master.count_all()
+
+        idx= random.randint(0, count - 1)
+        m = self.master.select_by_id(idx)
+        s = self.slave.select_by_id(idx)
+        assert m.value == s.value, "Data mismatch between master and slave"
+
+
+    @task
+    @custom_locust_task(name="ADD ONE & CHECK SYNC")
+    def add_one_and_check_sync(self):
+        count = self.master.count_all()
+
+        idx= random.randint(0, count - 1)
+        self.master.update_add_one(idx)
+
+        m = self.master.select_by_id(idx)
+        s = self.slave.select_by_id(idx)
+        assert m.value == s.value, "Data mismatch between master and slave"

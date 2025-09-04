@@ -40,6 +40,9 @@ class PostgresClient:
             self.db_session.commit()
         return
 
+    def count_all(self):
+        return self.db_session.query(Counter).count()
+    
     def select_all(self):
         return self.db_session.query(Counter).all()
 
