@@ -41,4 +41,4 @@ elif [ -n "${MASTER_HOST}" ]; then
     )
 fi
 
-docker-entrypoint.sh $@
+docker-entrypoint.sh postgres -ccluster_name=$NODE_NAME $@

@@ -4,7 +4,6 @@ x-node-template: &node-template
   build: ./database
   user: postgres
   command:
-    - postgres
     - -cconfig_file=/configs/postgres.conf
     - -chba_file=/configs/pg_hba.conf
   volumes:
@@ -81,6 +80,10 @@ services:
       - 8089:8089
     volumes:
       - ./client:/app
+    depends_on:
+      - node-1
+      - node-2
+      - node-3
     networks:
       - proxy-net
 
