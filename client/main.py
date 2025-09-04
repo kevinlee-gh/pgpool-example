@@ -1,6 +1,7 @@
 import random
 
 from locust import User, between, task
+from sqlalchemy import text
 
 from components.client import PostgresClient
 from components.locust_task import custom_locust_task
@@ -42,7 +43,7 @@ class PostgresLocust(User):
         self.slave.select_all()
 
     @task
-    @custom_locust_task(name="Check sync")
+    @custom_locust_task(name="RANDOM CHECK SYNC")
     def check_sync(self):
         count = self.master.count_all()
 
@@ -63,3 +64,18 @@ class PostgresLocust(User):
         m = self.master.select_by_id(idx)
         s = self.slave.select_by_id(idx)
         assert m.value == s.value, "Data mismatch between master and slave"
+
+    @task
+    @custom_locust_task(name="CHECK WAL RECEIVE SYNC")
+    def check_wal_receive_sync(self):
+        a = int(self.master.db_session.execute(text("SELECT pg_current_wal_lsn() - '0/0';")).first()[0])
+        b = int(self.slave.db_session.execute(text("SELECT pg_last_wal_receive_lsn() - '0/0';")).first()[0])
+        assert a <= b, "WAL receive LSN mismatch between master and slave"
+
+
+    @task
+    @custom_locust_task(name="CHECK WAL REPLAY SYNC")
+    def check_wal_replay_sync(self):
+        a = int(self.master.db_session.execute(text("SELECT pg_current_wal_lsn() - '0/0';")).first()[0])
+        b = int(self.slave.db_session.execute(text("SELECT pg_last_wal_replay_lsn() - '0/0';")).first()[0])
+        assert a <= b, "WAL replay LSN mismatch between master and slave"
