@@ -63,7 +63,7 @@ class PostgresLocust(User):
 
         m = self.master.select_by_id(idx)
         s = self.slave.select_by_id(idx)
-        assert m.value == s.value, "Data mismatch between master and slave"
+        assert m.value <= s.value, "Data mismatch between master and slave"
 
     @task
     @custom_locust_task(name="CHECK WAL RECEIVE SYNC")

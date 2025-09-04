@@ -37,7 +37,7 @@ x-master-template: &master-template
 
 x-slave-template: &slave-template
   <<: *node-template
-  environment:
+  environment: &node-envs
     PGDATA: /var/lib/postgresql/data/pgdata
 
     MASTER_HOST: postgres-proxy
@@ -95,12 +95,18 @@ services:
   
   node-2:
     <<: *slave-template
+    environment: 
+      <<: *node-envs
+      NODE_NAME: node_2
     volumes:
       - node-2:/var/lib/postgresql/data
       - ./database/configs:/configs:ro
 
   node-3:
     <<: *slave-template
+    environment: 
+      <<: *node-envs
+      NODE_NAME: node_3
     volumes:
       - node-3:/var/lib/postgresql/data
       - ./database/configs:/configs:ro
