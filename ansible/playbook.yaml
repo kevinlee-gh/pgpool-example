@@ -1,4 +1,3 @@
-
 - name: "Check connectivity to Postgres master"
   hosts: bastion
   vars_files:
@@ -8,7 +7,8 @@
     PGUSER: postgres
     PGPASSWORD: "{{ POSTGRES_PASSWORD }}"
   tasks:
-    - community.postgresql.postgresql_ping:
+    - name: Check connectivity to Postgres master
+      community.postgresql.postgresql_ping:
         login_host: "{{ master_node }}"
       register: master_ping
       until: "master_ping.is_available"

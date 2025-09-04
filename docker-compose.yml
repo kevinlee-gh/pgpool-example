@@ -19,6 +19,8 @@ x-node-template: &node-template
     resources:
       limits:
         memory: 2G
+  networks:
+    - postgres-net
 
 x-master-template: &master-template
   <<: *node-template
@@ -39,8 +41,8 @@ x-slave-template: &slave-template
   environment:
     PGDATA: /var/lib/postgresql/data/pgdata
 
-    MASTER_HOST: node-1
-    MASTER_PORT: 5433
+    MASTER_HOST: postgres-proxy
+    MASTER_PORT: 25433
     MASTER_REPLICATOR_USER: replicator
     MASTER_REPLICATOR_PASSWORD: replicator123
   deploy:
@@ -55,10 +57,19 @@ services:
     volumes:
       - ./ansible:/workspace
     working_dir: /workspace
+    # entrypoint:
+    #   - tail
+    #   - -f
+    #   - /dev/null
     entrypoint:
-      - tail
-      - -f
-      - /dev/null
+      - ansible-playbook
+      - -i
+      - inventory.yaml
+      - playbook.yaml
+    networks:
+      - postgres-net
+    depends_on:
+      - node-1
 
   client:
     build: ./client
@@ -66,7 +77,9 @@ services:
       - tail
       - -f
       - /dev/null
-    
+    networks:
+      - proxy-net
+
   node-1:
     <<: *master-template
     volumes:
@@ -98,6 +111,13 @@ services:
       - node-1
       - node-2
       - node-3
+    networks:
+      - proxy-net
+      - postgres-net
+
+networks:
+  postgres-net:
+  proxy-net:
 
 volumes:
   node-1:

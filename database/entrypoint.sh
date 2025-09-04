@@ -12,27 +12,33 @@ if [ -d "${PGDATA}" ]; then
     echo "INFO - PostgreSQL data directory exists"
 elif [ -n "${MASTER_HOST}" ]; then
     echo "INFO - Starting replication setup from master node"
-    MASTER_PORT=${MASTER_PORT:-5432}
+    (
+        export PGHOST=${MASTER_HOST}
+        export PGPORT=${MASTER_PORT:-5432}
+        export PGUSER=${MASTER_REPLICATOR_USER}
+        export PGPASSWORD=${MASTER_REPLICATOR_PASSWORD}
+        export PGDATABASE=postgres
 
-    RETRIES=10
-    for i in $(seq 1 $RETRIES); do
-        pg_isready -h ${MASTER_HOST} -U ${MASTER_REPLICATOR_USER} && \
-        PGPASSWORD=${MASTER_REPLICATOR_PASSWORD} psql -U ${MASTER_REPLICATOR_USER} -h ${MASTER_HOST} -c  "select version();" postgres && \
-        break
-        
-        if [ $i -eq $RETRIES ]; then
-            echo "ERROR - Master node is not ready after $RETRIES attempts"
-            exit 1
-        else
-            echo "INFO - Master node is still not ready, retrying..."
-            sleep 10
+        RETRIES=10
+        for i in $(seq 1 $RETRIES); do
+            pg_isready && \
+            psql -c  "select version();" && \
+            break
+            
+            if [ $i -eq $RETRIES ]; then
+                echo "ERROR - Master node is not ready after $RETRIES attempts"
+                exit 1
+            else
+                echo "INFO - Master node is still not ready, retrying..."
+                sleep 10
+            fi
+        done
+
+
+        if ! (pg_basebackup -D ${PGDATA} -vRC -X stream -S ${NODE_NAME}); then
+            psql -c  "SELECT pg_drop_replication_slot('${NODE_NAME}');"
         fi
-    done
-
-
-    if ! (PGPASSWORD=${MASTER_REPLICATOR_PASSWORD} pg_basebackup -h ${MASTER_HOST} -D ${PGDATA} -U ${MASTER_REPLICATOR_USER} -vRC -X stream -S ${NODE_NAME}); then
-        PGPASSWORD=${MASTER_REPLICATOR_PASSWORD} psql -U ${MASTER_REPLICATOR_USER} -h ${MASTER_HOST} -c  "SELECT pg_drop_replication_slot('${NODE_NAME}');" postgres
-    fi
+    )
 fi
 
 docker-entrypoint.sh $@
