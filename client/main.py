@@ -9,6 +9,7 @@ import psycopg
 from locust import User, TaskSet, task, between, events
 
 from database.schema.stress_test.counter import Counter
+from components.locust_task import custom_locust_task
 
 logging.basicConfig(
     level = logging.INFO,
@@ -19,25 +20,6 @@ logger = logging.getLogger(__name__)
 
 N_INSTANCES= 20
 
-def custom_locust_task(name):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            res, err = None, None
-            start_time = time.time()
-            try:
-                res = func(*args, **kwargs)
-            except Exception as e:
-                err = "error {}".format(e)
-
-            events.request.fire(
-                request_type="postgres",
-                name=name,
-                response_time=int((time.time() - start_time) * 1000),
-                response_length=sys.getsizeof(res) if res else 0,
-                exception=err
-            )
-        return wrapper
-    return decorator
 
 
 
