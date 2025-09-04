@@ -12,6 +12,7 @@ if [ -d "${PGDATA}" ]; then
     echo "INFO - PostgreSQL data directory exists"
 elif [ -n "${MASTER_HOST}" ]; then
     echo "INFO - Starting replication setup from master node"
+    MASTER_PORT=${MASTER_PORT:-5432}
 
     RETRIES=10
     for i in $(seq 1 $RETRIES); do

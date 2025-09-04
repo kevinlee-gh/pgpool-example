@@ -40,6 +40,7 @@ x-slave-template: &slave-template
     PGDATA: /var/lib/postgresql/data/pgdata
 
     MASTER_HOST: node-1
+    MASTER_PORT: 5433
     MASTER_REPLICATOR_USER: replicator
     MASTER_REPLICATOR_PASSWORD: replicator123
   deploy:
@@ -92,6 +93,7 @@ services:
       - "6435:5435"   # Postgres node 3
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/streams:/etc/nginx/streams:ro
     depends_on:
       - node-1
       - node-2
