@@ -10,7 +10,6 @@ class Counter(StressTestBase):
     
     id: Mapped[int] = Column(BigInteger(), primary_key=True)
     value: Mapped[int] = Column(BigInteger())
-    count: Mapped[int] = Column(BigInteger())
 
     created_at: Mapped[DateTime] = Column(DateTime(), default=datetime.now())
     updated_at: Mapped[DateTime] = Column(DateTime(), default=datetime.now(), onupdate=datetime.now())

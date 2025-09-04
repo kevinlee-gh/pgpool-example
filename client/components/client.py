@@ -39,3 +39,17 @@ class PostgresClient:
             self.db_session.add(counter)
             self.db_session.commit()
         return
+
+    def select_all(self):
+        return self.db_session.query(Counter).all()
+
+    def select_by_id(self, idx: int):
+        return self.db_session.query(Counter).filter(Counter.id == idx).first()
+
+    def update_add_one(self, idx: int):
+        self.db_session.query(Counter).filter(Counter.id == idx).update({
+            Counter.value: Counter.value + 1
+        })
+        self.db_session.commit()
+        return
+    
