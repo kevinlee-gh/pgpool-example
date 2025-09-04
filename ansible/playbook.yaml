@@ -1,5 +1,5 @@
 
-- name: "Check connectivity to Postgres nodes"
+- name: "Check connectivity to Postgres master"
   hosts: bastion
   vars_files:
     - vars.yaml
@@ -9,8 +9,12 @@
     PGPASSWORD: "{{ POSTGRES_PASSWORD }}"
   tasks:
     - community.postgresql.postgresql_ping:
-        login_host: "{{ item }}"
-      loop: "{{ nodes }}"
+        login_host: "{{ master_node }}"
+      register: master_ping
+      until: "master_ping.is_available"
+      retries: 3
+      delay: 30
+      failed_when: not master_ping.is_available
 - name: Setup master node
   hosts: bastion
   vars_files:
@@ -32,7 +36,21 @@
 
     - name: Reload Configs
       community.postgresql.postgresql_query:
-        login_host: "{{ item }}"
+        login_host: "{{ master_node }}"
         query:
           - SELECT pg_reload_conf()
-      loop: "{{ nodes }}"
+
+- name: "Check connectivity to Postgres Replica"
+  hosts: bastion
+  vars_files:
+    - vars.yaml
+  environment: *posgres_envs
+  tasks:
+    - community.postgresql.postgresql_ping:
+        login_host: "{{ item }}"
+      loop: "{{ rep_nodes }}"
+      register: rep_ping
+      until: "rep_ping.is_available"
+      retries: 5
+      delay: 60
+      failed_when: not rep_ping.is_available

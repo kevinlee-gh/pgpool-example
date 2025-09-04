@@ -84,7 +84,7 @@ services:
       - node-3:/var/lib/postgresql/data
       - ./database/configs:/configs:ro
 
-  nginx:
+  postgres-proxy:
     build: ./nginx
     ports:
       - "6433:5433"   # Postgres node 1
