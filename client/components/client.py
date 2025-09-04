@@ -34,7 +34,7 @@ class PostgresClient:
                 continue
             counter = Counter(
                 id = i,
-                value= 0, count=0
+                value= 0
             )
             self.db_session.add(counter)
             self.db_session.commit()

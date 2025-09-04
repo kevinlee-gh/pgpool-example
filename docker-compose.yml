@@ -73,10 +73,14 @@ services:
 
   client:
     build: ./client
-    entrypoint:
-      - tail
-      - -f
-      - /dev/null
+    # entrypoint:
+    #   - tail
+    #   - -f
+    #   - /dev/null
+    ports:
+      - 8089:8089
+    volumes:
+      - ./client:/app
     networks:
       - proxy-net
 
