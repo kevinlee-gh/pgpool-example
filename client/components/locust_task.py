@@ -2,6 +2,7 @@ import sys
 import time
 
 from locust import events
+from locust.exception import ResponseError
 
 def custom_locust_task(name):
     def decorator(func):
@@ -12,6 +13,9 @@ def custom_locust_task(name):
                 res = func(*args, **kwargs)
             except Exception as e:
                 err = "error {}".format(e)
+
+            if res == "skip":
+                return
 
             events.request.fire(
                 request_type="postgres",

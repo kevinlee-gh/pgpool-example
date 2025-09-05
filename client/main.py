@@ -51,7 +51,7 @@ class PostgresLocust(User):
         try:
             self.master.select_by_id(random.randint(0, count - 1))
         except Exception as e:
-            return
+            return "skip"
 
     @task
     @custom_locust_task(name="[MASTER] INSERT")
@@ -85,7 +85,7 @@ class PostgresLocust(User):
             m = self.master.select_by_id(idx)
             s = self.slave2.select_by_id(idx)
         except Exception as e:
-            return
+            return "skip"
         assert m.value == s.value, "Data mismatch between master and slave"
 
     @task
@@ -100,7 +100,7 @@ class PostgresLocust(User):
             m = self.master.select_by_id(idx)
             s = self.slave2.select_by_id(idx)
         except Exception as e:
-            return
+            return "skip"
         assert m.value <= s.value, "Data mismatch between master and slave"
 
     # @task
