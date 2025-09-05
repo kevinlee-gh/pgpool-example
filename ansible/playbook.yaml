@@ -28,6 +28,22 @@
         name: replicator
         password: "{{ REPLICATOR_PASSWORD }}"
         role_attr_flags: REPLICATION
+    
+    - name: Create monitor user
+      community.postgresql.postgresql_user:
+        login_host: "{{ master_node }}"
+
+        name: monitor
+        password: "monitor123"
+    - name: GRANT pg_monitor to monitor
+      community.postgresql.postgresql_membership:
+        login_host: "{{ master_node }}"
+        
+        group: pg_monitor
+        target_roles:
+        - monitor
+
+
     - name: Create database benchmark_db
       community.postgresql.postgresql_db:
         login_host: "{{ master_node }}"
