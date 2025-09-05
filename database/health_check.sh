@@ -13,11 +13,8 @@ export PGPASSWORD=${MONITOR_PASSWORD}
 pg_isready
 
 # Synchronous standby check
-if [[ -z "$(psql -Atc 'show synchronous_standby_names' postgres)" ]]; then
-    echo "ERROR - No synchronous standby names found"
-    exit 1
-fi
+standby_count=$(psql -tf /ha-scripts/sync_standby_count.sql postgres)
 
 sync_node=$(psql -Atc "SELECT application_name FROM pg_stat_replication WHERE sync_state = 'sync'" postgres)
 
-echo $sync_node
+echo $standby_count - $sync_node
