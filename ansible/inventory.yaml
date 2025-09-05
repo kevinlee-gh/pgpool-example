@@ -4,10 +4,12 @@ bastion:
       - node-1
       - node-2
       - node-3
+      - node-4
     master_node: node-1
     rep_nodes:
       - node-2
       - node-3
+      - node-4
   hosts:
     localhost:
       ansible_connection: local
