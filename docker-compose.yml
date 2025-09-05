@@ -93,7 +93,20 @@ services:
     volumes:
       - node-1:/var/lib/postgresql/data
       - ./database/configs:/configs:ro
-  
+
+  node-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.17.1
+    environment:
+      DATA_SOURCE_URI: "postgres-proxy:25433/postgres?sslmode=disable"
+      DATA_SOURCE_USER: "monitor"
+      DATA_SOURCE_PASS: "monitor123"
+    ports:
+      - "9187:9187"
+    depends_on:
+      - postgres-proxy
+    networks:
+      - proxy-net
+
   node-2:
     <<: *slave-template
     environment: 
