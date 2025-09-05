@@ -10,7 +10,7 @@ x-node-template: &node-template
     - /var/lib/postgresql/data/pgdata
     - ./database/configs:/configs:ro
   healthcheck:
-    test: 'pg_isready -U postgres --dbname=postgres'
+    test: 'pg_isready'
     interval: 10s
     timeout: 5s
     retries: 5
