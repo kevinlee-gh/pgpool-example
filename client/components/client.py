@@ -1,3 +1,5 @@
+import random
+
 from sqlalchemy import create_engine, inspect, update
 from sqlalchemy.schema import CreateSchema
 from sqlalchemy.orm import Session
@@ -33,10 +35,34 @@ class PostgresClient:
             if self.db_session.query(Counter).filter(Counter.id == i).all():
                 continue
             counter = Counter(
-                id = i,
                 value= 0
             )
             self.db_session.add(counter)
+            self.db_session.commit()
+        return
+
+    def insert_data(self, n=1):
+        for _ in range(n):
+            counter = Counter(
+                value= 0
+            )
+            self.db_session.add(counter)
+            self.db_session.commit()
+        return
+
+    def delete_data(self, n=1):
+        count = self.db_session.query(Counter).count()
+        
+        if count <= 1:
+            return
+        
+        delete_indices = set(random.choices(range(count), k=n))
+        for idx in delete_indices:
+            try:
+                counter = self.db_session.query(Counter).filter(Counter.id == idx).with_for_update().one()
+            except Exception as e:
+                return 
+            self.db_session.delete(counter)
             self.db_session.commit()
         return
 
@@ -47,7 +73,7 @@ class PostgresClient:
         return self.db_session.query(Counter).all()
 
     def select_by_id(self, idx: int):
-        return self.db_session.query(Counter).filter(Counter.id == idx).first()
+        return self.db_session.query(Counter).filter(Counter.id == idx).one()
 
     def update_add_one(self, idx: int):
         self.db_session.query(Counter).filter(Counter.id == idx).update({
