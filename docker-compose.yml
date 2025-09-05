@@ -93,6 +93,7 @@ services:
     volumes:
       - node-1:/var/lib/postgresql/data
       - ./database/configs:/configs:ro
+      - ./database/health_check.sh:/health_check.sh:ro
 
   node-exporter:
     image: quay.io/prometheuscommunity/postgres-exporter:v0.17.1
