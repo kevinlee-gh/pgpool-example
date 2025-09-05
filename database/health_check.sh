@@ -13,8 +13,8 @@ export PGPASSWORD=${MONITOR_PASSWORD}
 pg_isready
 
 # Synchronous standby check
-standby_count=$(psql -tf /ha-scripts/sync_standby_count.sql postgres)
+sync_count=$(psql -tf /ha-scripts/sync_standby_count.sql postgres)
 
-sync_node=$(psql -Atc "SELECT application_name FROM pg_stat_replication WHERE sync_state = 'sync'" postgres)
+current_sync_count=$(psql -Atc "SELECT COUNT(*) FROM pg_stat_replication WHERE sync_state = 'sync'" postgres)
 
-echo $standby_count - $sync_node
+echo $sync_count - $current_sync_count
