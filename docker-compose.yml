@@ -122,8 +122,8 @@ services:
       PGUSER: monitor
       PGPASSWORD: monitor123
     volumes:
-      - ./ha-watcher/scripts:/ha-scripts:ro
-      - ./ha-watcher/health_check.sh:/health_check.sh:ro
+      - ./ha-watcher/scripts:/scripts:ro
+      - ./ha-watcher/sql:/sql:ro
     networks:
       - postgres-net
 

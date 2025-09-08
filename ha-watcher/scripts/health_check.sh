@@ -5,7 +5,7 @@ set -e
 pg_isready
 
 # Synchronous standby check
-sync_count=$(psql -tf /ha-scripts/sync_standby_count.sql postgres)
+sync_count=$(psql -tf /sql/sync_standby_count.sql postgres)
 
 current_sync_count=$(psql -Atc "SELECT COUNT(*) FROM pg_stat_replication WHERE sync_state = 'sync'" postgres)
 
