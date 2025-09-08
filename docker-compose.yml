@@ -109,6 +109,24 @@ services:
     networks:
       - proxy-net
 
+  ha-watcher:
+    image: postgres:17.4-bookworm
+    user: postgres
+    entrypoint:
+      - tail
+      - -f
+      - /dev/null
+    environment:
+      PGHOST: node-1
+      PGPORT: 5432
+      PGUSER: monitor
+      PGPASSWORD: monitor123
+    volumes:
+      - ./ha-watcher/scripts:/ha-scripts:ro
+      - ./ha-watcher/health_check.sh:/health_check.sh:ro
+    networks:
+      - postgres-net
+
   node-2:
     <<: *slave-template
     environment: 
