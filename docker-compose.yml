@@ -102,6 +102,10 @@ services:
       DATA_SOURCE_URI: "postgres-proxy:25433/postgres?sslmode=disable"
       DATA_SOURCE_USER: "monitor"
       DATA_SOURCE_PASS: "monitor123"
+      
+      PG_EXPORTER_EXTEND_QUERY_PATH: /queries.yaml
+    volumes:
+      - ./node-exporter/queries.yaml:/queries.yaml:ro
     ports:
       - "9187:9187"
     depends_on:

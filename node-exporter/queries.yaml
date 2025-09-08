@@ -1,0 +1,7 @@
+pg_uptime:
+  query: "SELECT EXTRACT(EPOCH FROM now() - pg_postmaster_start_time()) as seconds"
+  metrics: 
+    - seconds:
+        usage: "COUNTER"
+        description: "PostgreSQL uptime in seconds"
+
