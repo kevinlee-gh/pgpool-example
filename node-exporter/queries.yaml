@@ -5,7 +5,7 @@ pg_uptime:
         usage: "COUNTER"
         description: "PostgreSQL uptime in seconds"
 
-pg_ha:
+pg_ha_sync_standby:
   query: |
     SELECT
         CASE
@@ -23,11 +23,21 @@ pg_ha:
             -- No ANY / FIRST keywords = FIRST 1 (...)
             ELSE
                 1
-        END AS min_sync_standbys
+        END AS min_required,
+        (
+            SELECT COUNT(*)
+            FROM pg_stat_replication
+            WHERE sync_state = 'sync'
+        ) AS current_count
     FROM pg_settings
     WHERE name = 'synchronous_standby_names';
   metrics:
-    - min_sync_standbys:
+    - min_required:
         usage: "GAUGE"
         description: "Minimum number of synchronous standbys required"
-  
+    - current_count:
+        usage: "GAUGE"
+        description: "Current number of synchronous standbys"
+
+
+# pg_settings:
