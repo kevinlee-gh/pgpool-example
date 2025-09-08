@@ -27,7 +27,7 @@ pg_ha_sync_standby:
         (
             SELECT COUNT(*)
             FROM pg_stat_replication
-            WHERE sync_state = 'sync'
+            WHERE sync_state IN ('sync', 'potential')
         ) AS current_count
     FROM pg_settings
     WHERE name = 'synchronous_standby_names';
