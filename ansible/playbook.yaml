@@ -81,4 +81,4 @@
         login_host: "{{ master_node }}"
 
         param: synchronous_standby_names
-        value: "FIRST 2 (node_2, node_3)"
+        value: "node_2,node_3"
