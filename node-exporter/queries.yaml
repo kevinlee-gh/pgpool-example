@@ -40,4 +40,12 @@ pg_ha_sync_standby:
         description: "Current number of synchronous standbys"
 
 
-# pg_settings:
+pg_cluster:
+  query: "SELECT setting AS cluster_name, 1 as info FROM pg_settings WHERE name = 'cluster_name'"
+  metrics:
+    - cluster_name:
+        usage: "LABEL"
+        description: "PostgreSQL cluster name"
+    - info:
+        usage: "GAUGE"
+        description: "Constant value for cluster_name metric"
