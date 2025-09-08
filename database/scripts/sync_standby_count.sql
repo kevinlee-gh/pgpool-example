@@ -11,10 +11,9 @@ SELECT
         WHEN setting ~* '^FIRST *([0-9]+)' THEN
             (regexp_match(setting, '^first *([0-9]+)', 'i'))[1]::int
 
-        -- No ANY / FIRST keywords => count standbys listed inside parentheses
+        -- No ANY / FIRST keywords = FIRST 1 (...)
         ELSE
-            regexp_count(setting, '[^,() ]+')
-
+            1
     END AS min_sync_standbys
 FROM pg_settings
 WHERE name = 'synchronous_standby_names';
